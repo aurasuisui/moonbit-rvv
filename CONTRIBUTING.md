@@ -27,19 +27,19 @@ qemu-riscv64 -L /usr/riscv64-linux-gnu ./_build/.../probe.exe
 
 ```
 src/                       # 公开包 aurasuisui/rvv
-├── lib.mbt                # 5 个 pub fn:参数检查 + 文档
+├── lib.mbt                # 公开 API(M0 探针;M1 起 5 原语)
 ├── dispatch_wasm.mbt      # targets: wasm / wasm-gc / js
-├── dispatch_native.mbt    # targets: native
-├── scalar/                # 纯 MoonBit 标量实现(全后端可导入)
-├── native/                # C 后端:extern "C" + kernel.c
-├── tests/                 # 黑盒测试(只依赖公开 API)
+├── dispatch_native.mbt    # targets: native → extern "C"
+├── scalar/                # M1 起:纯 MoonBit 标量实现(可无条件导入)
+├── native/kernel.c        # C 源文件(native-stub 引用),不是包
+├── tests/                 # M1 起:黑盒测试(只依赖公开 API)
 └── probe/                 # 可执行探针(M0 用;M4 决定去留)
 scripts/                   # 交叉编译 / qemu / bench
 bench/                     # 裸机 C harness,不是 MoonBit 包
 docs/                      # 文档,入口是 docs/README.md
 ```
 
-原则:**一个目录一个包**;实现按后端分包,不把实现文件堆在 `src/` 根;每个包只暴露一件事。
+原则:**有 `moon.pkg` 的目录才是包**;实现按职责分目录,不把实现文件堆在 `src/` 根;每个包只暴露一件事。target 条件包导入在本工具链不可用,因此 native 侧用文件级 `targets` 隔离,不建 native 子包(见计划 M0 结论)。
 
 ## 分支与提交模型
 

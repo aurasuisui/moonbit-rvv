@@ -37,7 +37,7 @@ bash scripts/bench.sh                # M3 起
 ## 结构
 
 ```
-src/           公开包(lib + dispatch + scalar/ + native/ + tests/ + probe/)
+src/           公开包(lib + dispatch + probe/;M1 加 scalar/ + tests/);native/ 只放 kernel.c
 scripts/       交叉编译、qemu、bench
 bench/         裸机 C harness
 docs/          文档枢纽与计划
@@ -55,4 +55,4 @@ docs/          文档枢纽与计划
 
 ## 当前状态
 
-M0 待执行:骨架 + target 分派探针 + `moon package --list` 结论 + RV64 交叉探针。
+M0 已完成并合并(结论见计划附录 C);M1 进行中:5 个原语的纯 MoonBit 标量实现 + `src/tests/` 黑盒测试。
