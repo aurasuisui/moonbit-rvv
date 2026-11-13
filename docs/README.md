@@ -16,7 +16,7 @@
 | MoonBit↔C ABI、数组布局、所有权 | [`NATIVE_ABI.md`](NATIVE_ABI.md) |
 | RV64 交叉编译配方 | [`CROSS_COMPILE.md`](CROSS_COMPILE.md) |
 | 性能口径、方法、结果、限制 | [`BENCHMARKS.md`](BENCHMARKS.md) |
-| 发布步骤与门禁 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)(M4) |
+| 发布步骤与门禁(命令 / 预期 / 勾选 / 证据落点) | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) |
 | 里程碑、看板、缺陷台账 | [`plans/v0.1.0.md`](plans/v0.1.0.md) |
 | agent 入口与硬规矩 | [`AGENTS.md`](../AGENTS.md) |
 
@@ -34,15 +34,10 @@
 | [`NATIVE_ABI.md`](NATIVE_ABI.md) | MoonBit↔C ABI:类型映射、数组布局、所有权、验证方法 | 改 `dispatch_native.mbt` / `kernel.c` |
 | [`CROSS_COMPILE.md`](CROSS_COMPILE.md) | RV64 交叉配方:clang/gcc 分工、`MOON_CC`、qemu 8.2、预期输出 | 做 RVV / 交叉验证 |
 | [`BENCHMARKS.md`](BENCHMARKS.md) | 性能口径(spike 退休指令数)、三档 harness、45 行结果、结论与限制 | 看性能数字 / 复核基准 |
+| [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | 发布门禁 Tier 0–4:每条的命令、预期、勾选框与证据落点;发布/打 tag 的人类门禁 | 准备发版 / 复核发布证据 |
 | [`../bench/results.md`](../bench/results.md) | **生成物**(`scripts/bench.sh`):45 行原始表,无时间戳、可逐字节复现 | 复核 `BENCHMARKS.md` 的数字 |
 | [`plans/v0.1.0.md`](plans/v0.1.0.md) | v0.1.0 计划:范围、里程碑、看板、缺陷台账 | 执行/审核里程碑 |
 | `README.md`(本文件) | 文档枢纽 / SSOT / 全量地图 | 不知道读哪份 |
-
-### 计划中(按里程碑落地)
-
-| 文件 | 角色 | 里程碑 |
-|---|---|---|
-| `RELEASE_CHECKLIST.md` | 发布门禁 | M4 |
 
 ## 阅读顺序
 
@@ -51,7 +46,7 @@
 - 动 native 的 C 边界:先读 `NATIVE_ABI.md`。
 - 做 RVV / 交叉:先读 `CROSS_COMPILE.md`。
 - 看性能 / 复跑基准:先读 `BENCHMARKS.md`(数字由 `scripts/bench.sh` 生成)。
-- 发版:先读 `RELEASE_CHECKLIST.md`(M4 起)。
+- 发版:先读 `RELEASE_CHECKLIST.md`(Tier 0–3 可由 agent 跑,Tier 4 的实际发布是人类门禁)。
 
 ## 规则
 

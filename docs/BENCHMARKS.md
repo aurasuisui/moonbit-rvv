@@ -50,6 +50,7 @@
 | `bench/kernels.c` | plain C 五内核,**同一份源码**分别给标量档与自动档 |
 | `bench/kernels_rvv.c` | 手写 RVV intrinsics 五内核(策略对齐 `src/native/kernel.c`) |
 | `bench/main.c` | 驱动:三档**完全相同**(同一份 gcc 产物),只替换内核对象 |
+| `bench/parity_main.c` | M4 运行期对拍的驱动(hosted C,不是裸机):逐值比较发布内核与 bench 内核,见 §7.1 |
 
 三档各链一个 ELF,驱动代码逐字节相同,差异只来自内核对象;每个 ELF 依次跑 5 原语 × 3 规模,
 打印 `RESULT <prim> <N> <REPS> <instret> <chk>`,由 `scripts/bench.sh` 解析。
@@ -253,6 +254,9 @@
    `bench/kernels*.c`;语义与策略对齐 `src/native/kernel.c`,但**不经过** MoonBit 编译器、
    `native-stub` 包装、`FixedArray` 读写与 ABI 转换。因此这些数字只能用于**三档实现之间的相对比较**,
    不能当作 MoonBit 用户可见的加速比。
+   M4 起,"`bench/kernels*.c` 是另一份会与发布内核漂移的实现"这一条已由运行期对拍关闭(§7.1 证明
+   两边逐值相等),所以数字描述的就是发布内核的算法;但**包装差异**(MoonBit 编译器、`native-stub`、
+   `FixedArray` 读写与 ABI 转换)仍然存在,限制不变。
 2. **主表三档的编译器/优化档不一致**。scalar = gcc 10.2 `-O2`、auto = clang 19 `-O3`、
    rvv = clang 19 `-O2`:主表只能描述"每档各自的表现",**不能**把档间差异直接归因于单一因素;
    `相对 scalar` 列还以 gcc 标量档为基线,而同一原语换编译器本身就能差 33%(§4.4 的 `count_ge`)。
@@ -276,13 +280,16 @@ bash scripts/bench.sh
 
 依赖:spike 1.1.1(`BENCH_SPIKE` 可覆盖路径)、clang-19(含 `llvm-objdump-19`,缺失时只跳过反汇编诊断)、
 riscv64-unknown-elf-gcc 10.2、`readelf`。构建产物写在 `_build/bench/`(`_build/` 已被 `.gitignore` 忽略)。
+对拍步骤(§7.1)另需 `riscv64-linux-gnu-gcc`、RISC-V sysroot(`/usr/riscv64-linux-gnu`)与 qemu-user 8.2
+(由 `scripts/run-qemu.sh` 选择并校验版本)。
 脚本每次运行都会断言:
 
 1. 每档恰好 **15 条 `RESULT`**(5 原语 × 3 规模),缺行即失败;
 2. **确定性**:同一 ELF 连跑两次,`RESULT` 行(instret 与 chk)逐位相同;
 3. **校验和**:15 个 (原语, N) 的三档 `chk` 完全相同;
 4. **口径**:`bench/` 与 `scripts/` 中没有对 cycle CSR 的读取;
-5. **VLEN**:rvv 档 VLPROBE = `vlenb=16 vlen=128 vlmax(e32m1)=4`。
+5. **VLEN**:rvv 档 VLPROBE = `vlenb=16 vlen=128 vlmax(e32m1)=4`;
+6. **运行期对拍**:`scripts/bench_parity.sh` 以裸行 `PARITY_OK` 结束,即发布内核与 bench 内核逐值相等(§7.1)。
 
 脚本结束时生成 `bench/results.md`(45 行数据)并以 `BENCH_OK` 结束;该文件**不含时间戳**,
 同一环境重跑逐字节相同,可直接作为提交证据。
@@ -296,3 +303,34 @@ bash scripts/bench_control.sh
 
 它断言:每个控制 ELF 跑两次逐位一致、N=8192 的 checksum 与主表对应行相同、两个 `-march=rv64gc`
 控制对象不含向量指令(反汇编器缺失时跳过该 sanity check)。
+
+### 7.1 发布内核 vs bench 内核的运行期对拍(M4 / P1)
+
+主表的数字来自 `bench/kernels*.c`,而它们是 `src/native/kernel.c` 的**独立实现**;两份实现一旦漂移,
+表就不再描述用户实际拿到的代码。`scripts/bench_parity.sh` 用同一份确定性输入在**运行期**证明两边逐值相等
+(`scripts/bench.sh` 末尾会自动调用它并断言 `PARITY_OK`):
+
+```bash
+bash scripts/bench_parity.sh
+# -> _build/parity/ 下两个宿主程序,qemu-user 8.2 各跑一次,以裸行 PARITY_OK 结束
+```
+
+| 对 | 发布侧(编译方式) | bench 侧 | 比较内容 |
+|---|---|---|---|
+| **A1** | `src/native/kernel.c`,gcc `-march=rv64gc`(C 标量分支) | `bench/kernels.c`,`k_*(..., reps=1)` | 5 原语的返回值 / 输出数组与长度 |
+| **A2** | `src/native/kernel.c`,clang-19 `-march=rv64gcv`(RVV 分支) | `bench/kernels_rvv.c`,`k_*(..., reps=1)` | 同上 |
+
+- **形态**:RV64 Linux **用户态**宿主程序(不是裸机 harness)。`kernel.c` 交给
+  `clang-19 --target=riscv64-linux-gnu --sysroot=/usr/riscv64-linux-gnu -march=rv64gcv`,其余 C 与链接交给
+  `riscv64-linux-gnu-gcc`(与 [CROSS_COMPILE.md](CROSS_COMPILE.md) §3 的分工相同),再在 qemu-user 8.2
+  (`-cpu rv64,v=true`)下运行。
+- **规模**:`n = 0, 1, 2, 3, 5, 7, 17, 1024`(与 M2 出口条件、`rvv_selftest` 同一组,非 VL 整数倍的尾部也在内)。
+- **阈值**:`INT32_MIN / 0 / INT32_MAX`(`count_ge`、`filter` 各 3 组);`prefix_sum`、`filter` 比较结果数组与长度。
+- **输入**:与 `bench/main.c` 完全相同的一份 LCG 数据(同种子,`a[0]=INT32_MAX`、`a[1]=INT32_MIN`),
+  所以对拍失败也意味着主表描述的不是这份数据。
+- **失败/通过**:失败打印 `PARITY_FAIL:<原语>:<A1|A2>:<n>` 并以非 0 退出;通过时只打印裸行 `PARITY_OK`。
+- **防伪**(避免"对拍了两份标量代码"的空转):A2 的 harness 先用 `-DPARITY_EXPECT_RVV` 调 `rvv_selftest()`,
+  返回 600 即"RVV 分支编译了但没执行",直接判失败;脚本另外用 `llvm-objdump` 断言两个 `kernel.o` 的
+  向量指令数分别为 0(A1 是标量分支)与 > 0(A2 是 RVV 分支),反汇编器缺失时跳过该条并注明。
+- **不在覆盖范围**:`auto` 档。发布侧只有"C 标量分支"与"手写 RVV 分支",没有"交给 LLVM 自动向量化的
+  plain C"这一对应物,所以 auto 档只存在于基准里(§6 限制 8 仍然成立)。
