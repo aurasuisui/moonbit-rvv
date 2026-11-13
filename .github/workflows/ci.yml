@@ -49,8 +49,9 @@ jobs:
           echo "$output"
           test "$output" = "15,3,35,325"
 
-      - name: Probe native (expects 15,3,35,325)
+      - name: Probe native (expects SELFTEST_PASS + 15,3,35,325)
         run: |
           output=$(moon run --target native src/probe)
-          echo "$output"
-          test "$output" = "15,3,35,325"
+          printf '%s\n' "$output"
+          printf '%s\n' "$output" | grep -qx SELFTEST_PASS
+          printf '%s\n' "$output" | grep -qx '15,3,35,325'
