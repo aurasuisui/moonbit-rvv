@@ -2,7 +2,7 @@
 
 MoonBit 的 RISC-V 向量(RVV)后端:一套数组原语,wasm/js 走纯 MoonBit 标量,native 走 C,RISC-V 走 RVV。
 
-> **状态**:`v0.1.0` 开发中。M1 已落地 5 个原语的纯 MoonBit 标量实现与黑盒测试;**M2 已落地 native 的双分支 C 内核**(C 标量 + `__riscv_vector` RVV intrinsics)、`extern "C"` 分派、C 自检与 RV64 交叉/qemu 验证配方;M3(基准)与 M4(发布门禁)待做。API 契约见 [docs/SPEC.md](docs/SPEC.md),ABI 与交叉配方分别见 [docs/NATIVE_ABI.md](docs/NATIVE_ABI.md)、[docs/CROSS_COMPILE.md](docs/CROSS_COMPILE.md)。
+> **状态**:`v0.1.0` 开发中。M1 已落地 5 个原语的纯 MoonBit 标量实现与黑盒测试;**M2 已落地 native 的双分支 C 内核**(C 标量 + `__riscv_vector` RVV intrinsics)、`extern "C"` 分派、C 自检与 RV64 交叉/qemu 验证配方;**M3 已落地 spike 退休指令数基准**(三档 × 5 原语 × 3 规模,45 行表);M4(发布门禁)待做。API 契约见 [docs/SPEC.md](docs/SPEC.md),ABI 与交叉配方分别见 [docs/NATIVE_ABI.md](docs/NATIVE_ABI.md)、[docs/CROSS_COMPILE.md](docs/CROSS_COMPILE.md)。
 
 ## 5 个原语
 
@@ -47,14 +47,29 @@ SELFTEST_PASS
 
 脚本会断言 `kernel.o` 由 clang 编译、产物含 RVV 指令、qemu 输出含 `SELFTEST_PASS` 与冒烟值。完整配方、clang/gcc 分工、`MOON_CC` 包装器与已知限制见 [docs/CROSS_COMPILE.md](docs/CROSS_COMPILE.md)。宿主 native 构建走 C 标量分支,可用 `nm` 在测试产物里看到 `rvv_sum` 等符号(见 [docs/NATIVE_ABI.md](docs/NATIVE_ABI.md) §8.3)。
 
+## 基准(spike 退休指令数)
+
+一条命令(WSL,需要 spike 1.1.1 + clang-19 + riscv64-unknown-elf-gcc):
+
+```bash
+bash scripts/bench.sh
+```
+
+脚本构建 3 个裸机 ELF(标量 `-O2 -march=rv64gc` / 自动向量化 `-O3 -march=rv64gcv` /
+手写 RVV intrinsics `-O2 -march=rv64gcv`),用 spike(`--isa=rv64gcv_zicntr`)各跑两遍,断言
+三档 checksum 逐位相同、同一 ELF 连跑两次指令数逐位相同、全程不读 cycle CSR,并生成
+`bench/results.md`(45 行 = 5 原语 × 3 规模 × 3 档)。口径、VLEN、编译器版本、结果与限制见
+[docs/BENCHMARKS.md](docs/BENCHMARKS.md)。
+
 ## 文档
 
 - [文档枢纽 / SSOT 地图](docs/README.md)
 - [API 契约 SPEC](docs/SPEC.md)
 - [MoonBit↔C ABI](docs/NATIVE_ABI.md)
 - [RV64 交叉配方](docs/CROSS_COMPILE.md)
+- [性能口径与结果(基准)](docs/BENCHMARKS.md)
 - [v0.1.0 计划](docs/plans/v0.1.0.md)
-- 计划中:`docs/BENCHMARKS.md`(M3)、`docs/RELEASE_CHECKLIST.md`(M4)
+- 计划中:`docs/RELEASE_CHECKLIST.md`(M4)
 
 ## 许可证
 
