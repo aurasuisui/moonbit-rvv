@@ -55,4 +55,4 @@ docs/          文档枢纽与计划
 
 ## 当前状态
 
-M0–M3 已合并;M4 的 T0–T3(文档、对拍、打包、干净目录自测)已完成并合并,**T4 发布门禁待人类**:`moon login` 后重跑 `moon publish --dry-run`(当前 exit 255,`Registry login is required`),再按 `docs/RELEASE_CHECKLIST.md` T4.2–T4.5 执行 `moon publish`、打 tag、发布后 `moon add` 验证。未 publish、未打 tag、未 push。
+**v0.1.0 已发布**:mooncakes.io `aurasuisui/rvv@0.1.0`(2026-11-13);GitHub `aurasuisui/moonbit-rvv` 已 push main + tag `v0.1.0`(→ `8d5d4f9`);发布后干净工程 `moon add` + 5/5×2 通过。后续缺陷按 `docs/RELEASE_CHECKLIST.md` 回滚规则走补丁版本,不改同号重发。

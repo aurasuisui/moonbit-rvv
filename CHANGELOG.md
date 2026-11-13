@@ -10,6 +10,9 @@
 
 **首个公开版本。**
 
+- 发布:mooncakes.io `aurasuisui/rvv@0.1.0`(2026-11-13,`Server status: 200 OK`);GitHub tag `v0.1.0` → `8d5d4f9`。
+- 发布后验证:干净工程 `moon add aurasuisui/rvv@0.1.0` 成功;5 原语在 wasm-gc/native 各 5/5;native 消费者产物含 `T rvv_*` 符号,证明 registry 包内 `src/native/kernel.c` 被编译链接。
+
 ### Added
 
 - 初始化仓库:`moon.mod`、Apache-2.0 LICENSE、文档体系、Git 分支模型。
