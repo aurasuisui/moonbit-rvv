@@ -1,0 +1,7 @@
+options(
+  "native-stub": [ "native/kernel.c" ],
+  targets: {
+    "dispatch_wasm.mbt": [ "wasm", "wasm-gc", "js" ],
+    "dispatch_native.mbt": [ "native" ],
+  },
+)

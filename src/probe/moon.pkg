@@ -1,0 +1,5 @@
+import {
+  "aurasuisui/rvv",
+}
+
+pkgtype(kind: "executable")
