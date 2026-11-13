@@ -1,3 +1,7 @@
+import {
+  "aurasuisui/rvv/scalar",
+}
+
 options(
   "native-stub": [ "native/kernel.c" ],
   targets: {
