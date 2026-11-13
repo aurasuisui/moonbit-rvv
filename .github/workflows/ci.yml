@@ -37,14 +37,20 @@ jobs:
       - name: Build native
         run: moon build --target native
 
-      - name: Probe wasm-gc (expects 43)
+      - name: Test wasm-gc
+        run: moon test --target wasm-gc
+
+      - name: Test native
+        run: moon test --target native
+
+      - name: Probe wasm-gc (expects 15,3,35,325)
         run: |
           output=$(moon run --target wasm-gc src/probe)
           echo "$output"
-          test "$output" = "43"
+          test "$output" = "15,3,35,325"
 
-      - name: Probe native (expects 42)
+      - name: Probe native (expects 15,3,35,325)
         run: |
           output=$(moon run --target native src/probe)
           echo "$output"
-          test "$output" = "42"
+          test "$output" = "15,3,35,325"
