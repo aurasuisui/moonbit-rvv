@@ -13,8 +13,8 @@
 | 分支模型 / 提交规则 / 测试约定 / 文档同步 | [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
 | 每次改动与关键决策 | [`CHANGELOG.md`](../CHANGELOG.md) |
 | API 契约:签名、语义、边界、panic、回绕 | [`SPEC.md`](SPEC.md) |
-| MoonBit↔C ABI、数组布局、所有权 | [`NATIVE_ABI.md`](NATIVE_ABI.md)(M2) |
-| RV64 交叉编译配方 | [`CROSS_COMPILE.md`](CROSS_COMPILE.md)(M2) |
+| MoonBit↔C ABI、数组布局、所有权 | [`NATIVE_ABI.md`](NATIVE_ABI.md) |
+| RV64 交叉编译配方 | [`CROSS_COMPILE.md`](CROSS_COMPILE.md) |
 | 性能口径、方法、结果、限制 | [`BENCHMARKS.md`](BENCHMARKS.md)(M3) |
 | 发布步骤与门禁 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)(M4) |
 | 里程碑、看板、缺陷台账 | [`plans/v0.1.0.md`](plans/v0.1.0.md) |
@@ -26,11 +26,13 @@
 
 | 文件 | 角色 | 何时读 |
 |---|---|---|
-| [`../README.md`](../README.md) | 产品门面:用途、原语表、后端、文档入口 | 想了解项目 |
+| [`../README.md`](../README.md) | 产品门面:用途、原语表、后端、交叉入口、文档入口 | 想了解项目 |
 | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) | 开发圣经:布局、分支、测试、文档同步 | 要改代码 |
 | [`../AGENTS.md`](../AGENTS.md) | agent 会话入口与硬规矩 | 开 agent 会话 |
 | [`../CHANGELOG.md`](../CHANGELOG.md) | 变更史与偏离 | 想知道改过什么 |
 | [`SPEC.md`](SPEC.md) | API 唯一真源:签名、语义、边界、panic、回绕 | 动 API / 写测试 |
+| [`NATIVE_ABI.md`](NATIVE_ABI.md) | MoonBit↔C ABI:类型映射、数组布局、所有权、验证方法 | 改 `dispatch_native.mbt` / `kernel.c` |
+| [`CROSS_COMPILE.md`](CROSS_COMPILE.md) | RV64 交叉配方:clang/gcc 分工、`MOON_CC`、qemu 8.2、预期输出 | 做 RVV / 交叉验证 |
 | [`plans/v0.1.0.md`](plans/v0.1.0.md) | v0.1.0 计划:范围、里程碑、看板、缺陷台账 | 执行/审核里程碑 |
 | `README.md`(本文件) | 文档枢纽 / SSOT / 全量地图 | 不知道读哪份 |
 
@@ -38,8 +40,6 @@
 
 | 文件 | 角色 | 里程碑 |
 |---|---|---|
-| `NATIVE_ABI.md` | MoonBit↔C ABI | M2 |
-| `CROSS_COMPILE.md` | RV64 交叉配方 | M2 |
 | `BENCHMARKS.md` | 性能口径与结果 | M3 |
 | `RELEASE_CHECKLIST.md` | 发布门禁 | M4 |
 
@@ -47,7 +47,8 @@
 
 - 新会话:`AGENTS.md` → `README.md` → `CONTRIBUTING.md` → 计划。
 - 动 API:先读 `SPEC.md`。
-- 做 RVV / 交叉:先读 `CROSS_COMPILE.md`(M2 起)。
+- 动 native 的 C 边界:先读 `NATIVE_ABI.md`。
+- 做 RVV / 交叉:先读 `CROSS_COMPILE.md`。
 - 发版:先读 `RELEASE_CHECKLIST.md`(M4 起)。
 
 ## 规则
