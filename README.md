@@ -28,7 +28,7 @@ RVV 走 C 是刻意的:MoonBit 无内联汇编、无 RVV intrinsics、无 riscv 
 
 ## 交叉构建 / RVV 验证
 
-一点命令(WSL,需要 clang-19 + riscv64 交叉 gcc + qemu 8.x):
+一条命令(WSL,需要 clang-19 + riscv64 交叉 gcc + qemu 8.x):
 
 ```bash
 export PATH=$HOME/.moon/bin:$PATH
