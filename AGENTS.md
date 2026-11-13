@@ -55,4 +55,4 @@ docs/          文档枢纽与计划
 
 ## 当前状态
 
-M0–M2 已完成并合并(M1 = 5 原语标量实现 + 40 个黑盒用例;M2 = C 标量/RVV 双分支 + RV64 交叉验证 + ABI/交叉文档)。M3 待执行:5 原语 × 3 档 × 3 规模的 spike 指令数基准与 `docs/BENCHMARKS.md`。
+M0–M3 已完成并合并(M1 = 5 原语标量实现 + 40 个黑盒用例;M2 = C 标量/RVV 双分支 + RV64 交叉验证 + ABI/交叉文档;M3 = 5×3×3 spike 指令数基准 + 控制实验 + `docs/BENCHMARKS.md`)。M4 待执行:README/CONTRIBUTING/CHANGELOG 定稿、`docs/RELEASE_CHECKLIST.md`、干净目录安装验证与发布门禁(实际发布需人类口令)。
