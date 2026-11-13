@@ -55,4 +55,4 @@ docs/          文档枢纽与计划
 
 ## 当前状态
 
-M0–M3 已完成并合并(M1 = 5 原语标量实现 + 40 个黑盒用例;M2 = C 标量/RVV 双分支 + RV64 交叉验证 + ABI/交叉文档;M3 = 5×3×3 spike 指令数基准 + 控制实验 + `docs/BENCHMARKS.md`)。M4 待执行:README/CONTRIBUTING/CHANGELOG 定稿、`docs/RELEASE_CHECKLIST.md`、干净目录安装验证与发布门禁(实际发布需人类口令)。
+M0–M3 已合并;M4 的 T0–T3(文档、对拍、打包、干净目录自测)已完成并合并,**T4 发布门禁待人类**:`moon login` 后重跑 `moon publish --dry-run`(当前 exit 255,`Registry login is required`),再按 `docs/RELEASE_CHECKLIST.md` T4.2–T4.5 执行 `moon publish`、打 tag、发布后 `moon add` 验证。未 publish、未打 tag、未 push。
