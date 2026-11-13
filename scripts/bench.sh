@@ -15,7 +15,9 @@
 #   4. no file under bench/ or scripts/ reads the cycle CSR -- the metric is
 #      retired instructions only (docs/BENCHMARKS.md);
 #   5. the rvv tier really executes vector instructions on VLEN=128
-#      (VLPROBE reports vlenb=16, vlen=128, vlmax(e32m1)=4).
+#      (VLPROBE reports vlenb=16, vlen=128, vlmax(e32m1)=4);
+#   6. runtime parity: src/native/kernel.c returns exactly what bench/kernels*.c
+#      returns for every primitive (scripts/bench_parity.sh, M4 / P1(b)).
 #
 # Metric: spike retired instructions (rdinstret) around one kernel call that
 # performs REPS passes over the input. spike must run with zicntr enabled.
@@ -359,4 +361,28 @@ data_rows=$(grep -cE '^\| [0-9]+ \|' "$RESULTS")
 [ "$data_rows" -eq 45 ] || fail "results table has $data_rows data rows, want 45"
 
 printf '== wrote %s (%d data rows)\n' "${RESULTS#"$REPO_ROOT"/}" "$data_rows"
+
+# ---------------------------------------------------------------------------
+# 6. runtime parity: shipping kernel vs bench kernels (M4 / P1(b))
+# ---------------------------------------------------------------------------
+# The table above is measured on bench/kernels*.c, which are separate
+# implementations of src/native/kernel.c. scripts/bench_parity.sh proves at run
+# time that both sides still return identical values (A1 scalar pair, A2 RVV
+# pair, n = 0 1 2 3 5 7 17 1024). Its build artifacts go to _build/parity; the
+# log stays next to the other bench evidence in _build/bench.
+printf '== parity: shipping kernel vs bench kernels (qemu-user 8.2, RV64)\n'
+PARITY_LOG="$BUILD_DIR/parity.log"
+if ! bash "$SCRIPT_DIR/bench_parity.sh" >"$PARITY_LOG" 2>&1; then
+  cat "$PARITY_LOG" >&2
+  fail "scripts/bench_parity.sh failed (log: $PARITY_LOG)"
+fi
+grep -qx "PARITY_OK" "$PARITY_LOG" \
+  || { cat "$PARITY_LOG" >&2; fail "parity did not print PARITY_OK (log: $PARITY_LOG)"; }
+if grep -q "PARITY_FAIL" "$PARITY_LOG"; then
+  cat "$PARITY_LOG" >&2
+  fail "parity reported a mismatch (log: $PARITY_LOG)"
+fi
+grep -E '^   A[12] PARITY_OK$' "$PARITY_LOG" | sed 's/^   /   parity /' || true
+printf '   PARITY_OK\n'
+
 printf '   BENCH_OK\n'
