@@ -95,7 +95,7 @@ pub fn dot(a : FixedArray[Int32], b : FixedArray[Int32]) -> Int64
 | `filter` | 否 | — |
 | `dot` | **是** | `a.length() != b.length()`,消息 `rvv: dot length mismatch` |
 
-M1 的验证口径:`dot` 的长度不等 panic 未纳入 `src/tests/api_test.mbt`(按 M1 任务约定,不写只验证“发生了 panic”的用例),以**代码审查**(`src/scalar/impl.mbt` 中唯一 `abort` 点)+ **手工运行**验证:native 打印 `rvv: dot length mismatch` 并以 `PanicError` 退出(exit 134),wasm-gc 以 `RuntimeError: unreachable` 退出(exit 1)。工具链本身支持核心库使用的 `test "panic …"` 约定,后续里程碑可补成回归用例。
+M1 的验证口径:`dot` 的长度不等 panic 由 `src/tests/api_test.mbt` 的 `test "panic dot length mismatch"` 覆盖(工具链 `test "panic …"` 约定:用例发生 panic 即通过),wasm-gc 与 native 均 40/40 通过。该约定只断言“发生了 panic”,不断言消息文本;消息文本 `rvv: dot length mismatch` 由**代码审查**(`src/scalar/impl.mbt` 中唯一 `abort` 点)+ **手工运行**确认:native 打印该消息并以 `PanicError` 退出(exit 134),wasm-gc 以 `RuntimeError: unreachable` 退出(exit 1)。
 
 ## 6. 非目标(v0.1.0 明确不做)
 

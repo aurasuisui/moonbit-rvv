@@ -6,8 +6,10 @@
 /// all-equal, strictly increasing, Int32 extremes and a length that is not a
 /// multiple of 4, plus the cross-primitive invariants listed at the end.
 ///
-/// `dot` with mismatched lengths deliberately has no test here: the panic is
-/// verified by code review and a manual run (see docs/SPEC.md).
+/// `dot` with mismatched lengths is covered by the toolchain's `test "panic …"`
+/// convention: `test "panic dot length mismatch"` below passes only when the
+/// call panics. The convention cannot check the message text, so the exact
+/// message is additionally pinned by code review and a manual run (docs/SPEC.md).
 
 ///|
 /// Shorthand for building a `FixedArray[Int32]` from an array literal.
@@ -236,6 +238,11 @@ test "dot length not multiple of 4" {
 ///|
 test "dot negative values" {
   assert_eq(@rvv.dot(fa([-1, -2, -3]), fa([4, 5, 6])), -32L)
+}
+
+///|
+test "panic dot length mismatch" {
+  @rvv.dot(fa([1, 2, 3]), fa([1, 2])) |> ignore
 }
 
 // cross-primitive invariants -------------------------------------------------
