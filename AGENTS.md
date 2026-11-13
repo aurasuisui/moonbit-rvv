@@ -55,4 +55,4 @@ docs/          文档枢纽与计划
 
 ## 当前状态
 
-M0 已完成并合并(结论见计划附录 C);M1 进行中:5 个原语的纯 MoonBit 标量实现 + `src/tests/` 黑盒测试。
+M0、M1 已完成并合并(M0 结论见计划附录 C;M1 = 5 原语标量实现 + 40 个黑盒用例)。M2 待执行:`kernel.c` 的 C 标量/RVV 双分支、交叉脚本、`docs/NATIVE_ABI.md` 与 `docs/CROSS_COMPILE.md`。
