@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.mbt text eol=lf
+*.mbti text eol=lf
+*.mod text eol=lf
+*.pkg text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
