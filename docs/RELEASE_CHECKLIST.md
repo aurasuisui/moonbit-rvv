@@ -191,14 +191,16 @@ Error: module `aurasuisui/rvv` was not found in the registry
 
 | 项 | 状态 |
 |---|---|
-| Tier 0 | 已跑(见 M4 验收报告;`_build/release/t0-*.log`) |
-| Tier 1 | 已跑(`bash scripts/cross-riscv.sh` exit 0) |
-| Tier 2 | 已跑(`bench.sh` / `bench_parity.sh` / `bench_control.sh` 均 exit 0) |
-| Tier 3 | 已跑(T3.1–T3.3、T3.5);T3.4 为**发布后**步骤,现在按预期阻塞 |
-| Tier 4.1 | 已跑,**被认证阻塞**,原样输出见下 |
-| Tier 4.2–4.5 | **未执行**,等人类口令(agent 不 publish / 不打 tag / 不 push) |
+| Tier 0 | 已跑:2026-11-13 发布前最终门禁 exit 0(40/40 ×2) |
+| Tier 1 | 已跑:`bash scripts/cross-riscv.sh` exit 0(`SELFTEST_PASS`,vsetvli 19 / vle32 12) |
+| Tier 2 | 已跑:`bench.sh`(45 行 + `PARITY_OK`)、`bench_parity.sh`、`bench_control.sh` 均 exit 0 |
+| Tier 3 | 已跑(T3.1–T3.3、T3.5);T3.4 为**发布后**步骤 |
+| Tier 4.1 | **通过**:人类已 `moon login`;2026-11-13 复跑 `moon publish --dry-run` exit 0(`Server status: 202 Accepted`) |
+| Tier 4.2–4.5 | 本次发布执行中(执行会话受人类委托执行;见文末发布记录) |
 
-### T4.1 实测输出(2026-11-13,`moon 0.1.20261104`)
+### T4.1 实测输出
+
+**2026-11-13 登录前(历史记录,已被下面这次替换):**
 
 ```text
 $ moon publish --dry-run
@@ -209,5 +211,16 @@ $ echo $?
 255
 ```
 
-**判定:明确阻塞(认证),人类门禁。** 该失败**不**代表包内容有问题 —— `moon publish` 在校验包之前就要求 registry 登录。
-执行会话按规矩不 `moon login`、不输入凭据、不重试绕过;人类登录后需重跑 T4.1,确认 exit 0 再进 T4.2。
+**2026-11-13 人类 `moon login` 后(当前状态):**
+
+```text
+$ moon whoami
+Logged in as aurasuisui
+
+$ moon publish --dry-run
+Server status: 202 Accepted
+$ echo $?
+0
+```
+
+校验内容:打包 zip 被解到临时目录并重新 `moon check` 通过。**T4.1 已通过,不再阻塞。**

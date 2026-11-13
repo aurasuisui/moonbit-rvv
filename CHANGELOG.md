@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+(暂无)
+
+## [0.1.0] - 2026-11-13
+
+**首个公开版本。**
+
 ### Added
 
 - 初始化仓库:`moon.mod`、Apache-2.0 LICENSE、文档体系、Git 分支模型。
@@ -38,3 +44,11 @@
 - M3 未改动 `src/**`、`docs/plans/**`、`CONTRIBUTING.md`、`AGENTS.md`、`moon.mod`、`scripts/cross-riscv.sh`、`scripts/run-qemu.sh`;宿主 `moon check` / `moon fmt --check` / `moon test --target wasm-gc` / `moon test --target native` 仍为 exit 0、40/40。
 - M4 偏离与取舍:①`moon publish --dry-run` 在本工具链(`moon 0.1.20261104`)上**要求 registry 登录**,实测 `exit 255`:`Registry login is required; run 'moon login'` / `Error: 'moon publish' failed`;按规矩不 `moon login`、不输入凭据、不绕过,原样记录并标为人类门禁(见 `docs/RELEASE_CHECKLIST.md` T4.1);②干净目录安装:包未发布时 `moon add aurasuisui/rvv@0.1.0` 实测 `Error: module 'aurasuisui/rvv' was not found in the registry`,且把包直接拷进消费者工程的 `.mooncakes/aurasuisui/rvv` 也过不了 `moon check`(`Cannot find import 'aurasuisui/rvv'`),因此**不伪装安装**;发布前能验证到的是"`moon package` 产物解包到仓库外干净目录后 `moon check` 通过、两个 target 各 40/40、两个探针输出正确",发布后必须补 T3.4 的 `moon add` + 消费者 S1/S2(计划 §九 砍尾顺序第 5 条允许该降级,已在清单中写明);③对拍不改 `src/native/kernel.c`、不改 45 行主表与 §4.4 控制表数字,`bash scripts/bench.sh` 重跑后 `bench/results.md` 逐字节不变;④P1 按 (b) 实施(运行期对拍),未改成让 bench 驱动直接调发布内核。
 - M4 未改动 `src/**`、`docs/plans/**`、`CONTRIBUTING.md`、`AGENTS.md`、`moon.mod`、`LICENSE`、`scripts/cross-riscv.sh`、`scripts/run-qemu.sh`、`bench/results.md`、`bench/kernels*.c`、`bench/main.c`、`bench/bench.h`、`bench/platform_htif.c`、`bench/crt0.S`、`bench/link.ld`;`pkg.generated.mbti` 仍未入库。
+
+### 已知限制(v0.1.0)
+
+- 无 RISC-V RVV 硬件:RVV 正确性来自 qemu 8.2(`scripts/cross-riscv.sh`),性能数字来自 spike 退休指令数(`docs/BENCHMARKS.md`)。
+- CI 只跑 wasm-gc / native;RVV 分支需在 WSL 本地运行 `bash scripts/cross-riscv.sh`。
+- Windows native 的 `native-stub` 路径未验证(仅 WSL/Linux 验证)。
+- 基准测量的是等价 C 内核,不是 MoonBit 生成产物;`auto` 档没有发布侧对应物。
+- `prefix_sum` 在 VLEN=128 当前实现下不加速(auto 1.00×、RVV 1.25×)。
